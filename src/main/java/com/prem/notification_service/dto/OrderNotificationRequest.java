@@ -1,14 +1,22 @@
 package com.prem.notification_service.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.List;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class OrderNotificationRequest extends NotificationRequest{
+public record OrderNotificationRequest(NotificationMetaData notificationMetaData,
+                                       NotificationType type,
+                                       NotificationChannel channel,
+                                       String recipient,
+                                       String orderId,
+                                       List<Product> productList,
+                                       LocalDateTime expectedDeliveryTime,
+                                       Long total,
+                                       String deliveryAddress
+                                       //string invoiceFile
+                                       ) implements NotificationRequest {
 
-
+    public OrderNotificationType getNotificationType(){
+        return (OrderNotificationType) notificationMetaData.type();
+    }
 }

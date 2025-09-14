@@ -2,16 +2,17 @@ package com.prem.notification_service.service;
 
 
 import com.prem.notification_service.dto.NotificationChannel;
+import com.prem.notification_service.dto.NotificationMetaData;
 import com.prem.notification_service.dto.NotificationRequest;
 import com.prem.notification_service.dto.UserNotificationRequest;
 
 public class UserNotificationHandler implements NotificationHandler{
 
-    private MailgunApiEmailService mailgunApiEmailService;
-    private MailgunSmsService mailgunSmsService;
+    private final UserEmailService userEmailService;
+    private final MailgunSmsService mailgunSmsService;
 
-    public UserNotificationHandler(MailgunApiEmailService mailgunApiEmailService, MailgunSmsService mailgunSmsService) {
-        this.mailgunApiEmailService = mailgunApiEmailService;
+    public UserNotificationHandler(UserEmailService userEmailService, MailgunSmsService mailgunSmsService) {
+        this.userEmailService = userEmailService;
         this.mailgunSmsService = mailgunSmsService;
     }
 
@@ -19,7 +20,7 @@ public class UserNotificationHandler implements NotificationHandler{
     public void handleNotification(NotificationRequest notificationRequest) {
 
         UserNotificationRequest userNotificationRequest = (UserNotificationRequest) notificationRequest;
-        switch (userNotificationRequest.getType()) {
+        switch (userNotificationRequest.getNotificationType()) {
             case PASSWORD_RESET -> sendUserPasswordResetNotification(userNotificationRequest);
             case OTP -> sendOtpVerificationNotification(userNotificationRequest);
             case REGISTRATION_SUCCESS -> sendUserRegistrationSuccessNotification(userNotificationRequest);
@@ -29,15 +30,15 @@ public class UserNotificationHandler implements NotificationHandler{
 
     private void sendUserRegistrationSuccessNotification(UserNotificationRequest notificationRequest) {
 
-        if(notificationRequest.getChannel() == NotificationChannel.BOTH){
+        if(notificationRequest.notificationMetaData().channel() == NotificationChannel.BOTH){
             mailgunSmsService.sendUSerRegistrationSuccessNotification(notificationRequest);
-            mailgunApiEmailService.sendUserRegistrationSuccessNotification(notificationRequest);
+            userEmailService.sendUserRegistrationSuccessNotification(notificationRequest);
         }
 
     }
 
     private void sendUserPasswordResetNotification(UserNotificationRequest notificationRequest) {
-        mailgunApiEmailService.sendUserPasswordResetNotification(notificationRequest);
+        userEmailService.sendUserPasswordResetNotification(notificationRequest);
 
     }
 
